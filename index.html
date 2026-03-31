@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Klima-Experten Check: Chemie & Politik</title>
+    <style>
+        :root {
+            --primary: #2c3e50; --secondary: #3498db; --success: #27ae60;
+            --error: #e74c3c; --bg: #f4f7f6; --card: #ffffff;
+        }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--primary); padding: 15px; line-height: 1.5; margin: 0; }
+        .container { max-width: 850px; margin: 0 auto; padding-bottom: 50px; }
+        header { text-align: center; padding: 25px; background: linear-gradient(135deg, #1e3c72, #2a5298); color: white; border-radius: 15px; margin-bottom: 25px; }
+        .quiz-card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-left: 6px solid var(--secondary); }
+        h2 { color: var(--secondary); font-size: 1.1rem; margin: 0 0 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        .question-desc { font-style: italic; font-size: 0.9rem; color: #7f8c8d; margin-bottom: 10px; display: block; }
+        .inline-select { appearance: none; background: #fff; border: 2px solid var(--secondary); border-radius: 8px; padding: 12px; font-size: 1rem; cursor: pointer; margin: 10px 0; color: var(--primary); font-weight: bold; width: 100%; }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+        .btn { padding: 14px; border: 2px solid #ddd; border-radius: 12px; background: white; text-align: left; font-size: 1rem; cursor: pointer; }
+        .feedback { margin-top: 12px; padding: 12px; border-radius: 10px; display: none; font-weight: bold; }
+        .correct-ans { border-color: var(--success) !important; background: #eafff0 !important; }
+        .wrong-ans { border-color: var(--error) !important; background: #fff0f0 !important; }
+
+        #confirm-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; text-align: center; max-width: 400px; margin: 20px; }
+
+        #final-result { display: none; background: #fff; padding: 30px; border-radius: 20px; border: 4px solid var(--secondary); margin-top: 20px; }
+        .score-big { font-size: 3.5rem; font-weight: bold; color: var(--secondary); text-align: center; margin: 0; }
+        .points-badge { font-size: 1.5rem; background: var(--primary); color: white; padding: 10px 20px; border-radius: 50px; display: inline-block; margin: 10px 0; }
+        
+        .error-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.85rem; }
+        .error-table th, .error-table td { border: 1px solid #ddd; padding: 10px; text-align: left; vertical-align: top; }
+        .error-table th { background-color: #f8f9fa; }
+        .txt-wrong { color: var(--error); font-weight: bold; }
+        .txt-correct { color: var(--success); font-weight: bold; }
+
+        .check-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 1.1rem; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header id="quiz-header">
+        <h1>🌍 Klima-Check: Chemie, Ökologie & Politik</h1>
+        <p>G9 Niedersachsen | 20 Fachfragen zur Analyse</p>
+    </header>
+
+    <div id="quiz-main">
+        <div class="quiz-card" id="q1">
+            <h2>1. Molekulare Ebene</h2>
+            <span class="question-desc">Thema: IR-Aktivität von Gasen</span>
+            <p>Damit ein Gas den Treibhauseffekt verstärken kann, muss das Molekül IR-Strahlung absorbieren können. Welche physikalische Bedingung muss dafür zwingend erfüllt sein?</p>
+            <select class="inline-select" data-ans="Das elektrische Dipolmoment muss sich während der Schwingung ändern.">
+                <option value="">-- Bitte wählen --</option>
+                <option>Das Molekül muss eine ungerade Anzahl an Neutronen besitzen.</option>
+                <option>Das elektrische Dipolmoment muss sich während der Schwingung ändern.</option>
+                <option>Das Gas muss schwerer sein als die durchschnittliche Luftdichte.</option>
+                <option>Es muss eine polare Atombindung ohne Schwingungsmöglichkeit vorliegen.</option>
+                <option>Das Molekül muss im sichtbaren Lichtspektrum farbig erscheinen.</option>
+                <option>Es muss sich um ein einatomiges Edelgas handeln.</option>
+            </select>
+            <button class="check-btn" onclick="checkTask('q1', 'Bedingung für IR-Aktivität von Molekülen')">Antwort prüfen</button>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-card" id="q2">
+            <h2>2. Strahlungsbilanz der Erde</h2>
+            <span class="question-desc">Thema: Absorption und Emission</span>
+            <p>Die Erdoberfläche wird durch kurzwellige Sonnenstrahlung erwärmt. In welcher Form gibt die Erde diese Energie wieder in Richtung Weltraum ab?</p>
+            <div class="options-grid">
+                <button class="btn" onclick="checkMC(this, true, 'q2', 'Form der terrestrischen Wärmeabstrahlung')">Langwellige Infrarotstrahlung (Wärmestrahlung)</button>
+                <button class="btn" onclick="checkMC(this, false, 'q2', 'Form der terrestrischen Wärmeabstrahlung')">Hochenergetische UV-C Strahlung</button>
+                <button class="btn" onclick="checkMC(this, false, 'q2', 'Form der terrestrischen Wärmeabstrahlung')">Kurzwellige Röntgenstrahlen</button>
+                <button class="btn" onclick="checkMC(this, false, 'q2', 'Form der terrestrischen Wärmeabstrahlung')">Sichtbares grünes Licht (Reflexion)</button>
+                <button class="btn" onclick="checkMC(this, false, 'q2', 'Form der terrestrischen Wärmeabstrahlung')">Radioaktive Alphastrahlung</button>
+                <button class="btn" onclick="checkMC(this, false, 'q2', 'Form der terrestrischen Wärmeabstrahlung')">Kosmische Hintergrundstrahlung</button>
+            </div>
+            <div class="feedback"></div>
+        </div>
+
+        <div class="quiz-card" id="q3">
+            <h2>3. Ozeanchemie & CO2</h2>
+            <span class="question-desc">Thema: Chemische Reaktion im Meer</span>
+            <p>Wenn CO2 aus der Atmosphäre im Meerwasser gelöst wird, reagiert ein Teil davon chemisch mit dem Wasser. Welche Säure entsteht dabei primär und sorgt für die Absenkung des pH-Wertes?</p>
+            <select class="inline-select" data-ans="Kohlensäure (H2CO3)">
+                <option value="">-- Bitte wählen --</option>
+                <option>Salzsäure (HCl)</option>
+                <option>Schwefelsäure (H2SO4)</option>
+                <option>Kohlensäure (H2CO3)</option>
+                <option>Essigsäure (CH3COOH)</option>
+                <option>Salpetersäure (HNO3)</option>
+                <option>Phosphorsäure (H3PO4)</option>
+            </select>
+            <button class="check-btn" onclick="checkTask('q3', 'Chemische Reaktion von CO2 mit Meerwasser')">Antwort prüfen</button>
+            <div class="feedback"></div>
+        </div>
+
+        <div id="dynamic-questions"></div>
+    </div>
+
+    <button id="eval-btn" onclick="openModal()" style="width:100%; padding:20px; background:var(--success); color:white; border:none; border-radius:15px; font-size:1.3rem; font-weight:bold; cursor:pointer; margin-bottom:100px;">🏁 Quiz abschließen & Analyse sehen</button>
+
+    <div id="confirm-modal">
+        <div class="modal-content">
+            <h3>Abgabe bestätigen</h3>
+            <p>Möchtest du die Auswertung starten? Deine Fehler werden danach detailliert für die Korrektur aufgelistet.</p>
+            <button class="check-btn" style="background:var(--success);" onclick="finishQuiz()">Ja, Auswerten!</button>
+            <button class="check-btn" style="background:var(--error);" onclick="closeModal()">Zurück</button>
+        </div>
+    </div>
+
+    <div id="final-result">
+        <div class="result-header" style="text-align: center;">
+            <h1>📊 Deine Analyse</h1>
+            <p class="score-big" id="final-score">0 / 20</p>
+            <div class="points-badge" id="points-badge">0 Punkte</div>
+            <p id="grade-comment" style="font-weight: bold;"></p>
+        </div>
+
+        <div id="error-section">
+            <h3 style="border-bottom: 2px solid var(--error); padding-bottom: 5px; color: var(--error);">❌ Korrektur-Liste deiner Fehler:</h3>
+            <table class="error-table" id="error-table">
+                <thead>
+                    <tr>
+                        <th>Aufgabe / Kontext</th>
+                        <th>Deine Antwort</th>
+                        <th>Richtige Lösung</th>
+                    </tr>
+                </thead>
+                <tbody id="error-body"></tbody>
+            </table>
+        </div>
+
+        <button class="check-btn" onclick="location.reload()" style="background:var(--secondary); margin-top:30px;">🔄 Quiz neu starten</button>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    let errorLog = [];
+
+    // Daten für Fragen 4-20 mit präzisen Formulierungen
+    const questionsData = [
+        ["4. Wissenschaftlicher Beirat", "Welches internationale Gremium (Weltklimarat) wertet regelmäßig den aktuellen Forschungsstand für die Politik aus?", "IPCC (Intergovernmental Panel on Climate Change)", ["NATO Council", "IPCC (Intergovernmental Panel on Climate Change)", "FIFA Environment Committee", "UNICEF Climate Branch", "G7 Research Group", "WMO-Security"]],
+        ["5. Natürliche Strahlungsbilanz", "Wie hoch wäre die globale Durchschnittstemperatur der Erdoberfläche ohne den natürlichen Treibhauseffekt?", "-18 °C", ["+15 °C", "0 °C", "-18 °C", "-50 °C", "+33 °C", "-10 °C"]],
+        ["6. Albedo-Effekt", "Welche Oberfläche weist die geringste Albedo auf und trägt somit durch hohe Absorption zur Erwärmung bei?", "Dunkle Ozeanflächen", ["Frisches Meereis", "Dunkle Ozeanflächen", "Sahara-Wüstensand", "Dichte Wolkendecken", "Kalksteingebirge", "Gletscherflächen"]],
+        ["7. Landwirtschaft & Chemie", "Welches Treibhausgas wird in der Landwirtschaft primär durch mikrobiologische Prozesse bei Überdüngung (Denitrifikation) freigesetzt?", "Lachgas (N2O)", ["Methan (CH4)", "Kohlenstoffdioxid (CO2)", "Lachgas (N2O)", "Ozon (O3)", "Schwefeldioxid (SO2)", "Argon (Ar)"]],
+        ["8. Global Warming Potential", "Was beschreibt der Fachbegriff GWP (Treibhauspotential) im Kontext der Klimaforschung?", "Die Klimawirksamkeit eines Gases im Vergleich zu CO2 über einen Zeitraum.", ["Die maximale Temperatur, die ein Gas erreichen kann.", "Die Klimawirksamkeit eines Gases im Vergleich zu CO2 über einen Zeitraum.", "Die Geschwindigkeit, mit der ein Gas mit Ozon reagiert.", "Die Löslichkeit des Gases in Regenwasser.", "Den aktuellen Marktpreis für CO2-Zertifikate.", "Die Verweildauer des Gases im Boden."]],
+        ["9. Meeresspiegelanstieg", "Welcher physikalische Prozess trägt neben dem Abschmelzen von Festlandeis massiv zum Anstieg des Meeresspiegels bei?", "Die thermische Expansion des erwärmten Meerwassers.", ["Die Zunahme der globalen Wellenbewegung.", "Die thermische Expansion des erwärmten Meerwassers.", "Das Absinken der Kontinentalplatten durch Gewicht.", "Die Zunahme des Salzgehaltes im Ozean.", "Vermehrte Niederschläge direkt über den Meeren.", "Die magnetische Anziehung des Mondes."]],
+        ["10. CCS-Technologie", "Was versteht man unter dem technischen Verfahren CCS zur Reduktion atmosphärischen Kohlenstoffdioxids?", "Abscheidung und dauerhafte unterirdische Speicherung von CO2.", ["Kühlung der Atmosphäre durch künstliche Wolken.", "Abscheidung und dauerhafte unterirdische Speicherung von CO2.", "Umwandlung von Plastikmüll in Treibstoff.", "Filterung von Methan aus Kuhställen.", "Reinigung der Meere von Mikroplastik.", "Künstliche Photosynthese in Wüstengebieten."]],
+        ["11. Permafrost-Kipppunkt", "Welches Gas entweicht beim Auftauen sibirischer Permafrostböden und sorgt für eine positive Rückkopplung?", "Methan (CH4)", ["Sauerstoff (O2)", "Stickstoff (N2)", "Methan (CH4)", "Argon (Ar)", "Neon (Ne)", "Helium (He)"]],
+        ["12. Ökonomische Folgen", "Welche ökonomische Prognose stellte der Stern-Report bezüglich der Kosten eines ungebremsten Klimawandels auf?", "Verlust von bis zu 20 % des globalen Bruttoinlandsprodukts (BIP).", ["Starkes Wirtschaftswachstum durch längere Sommer.", "Verlust von bis zu 20 % des globalen Bruttoinlandsprodukts (BIP).", "Sinken der weltweiten Lebensmittelpreise.", "Wegfall aller staatlichen Steuern auf Energie.", "Vollbeschäftigung im Baugewerbe durch Deichbau.", "Wertsteigerung aller Immobilien in Küstennähe."]],
+        ["13. EU-Emissionshandel", "Nach welchem marktwirtschaftlichen Prinzip funktioniert der EU-Zertifikatehandel (ETS)?", "Cap and Trade (Obergrenze und Handel)", ["Subventionierung von Kohlekraftwerken.", "Cap and Trade (Obergrenze und Handel)", "Fixpreis-System ohne Mengenlimit.", "Staatliche Zuteilung ohne Handelsmöglichkeit.", "Importverbot für fossile Energieträger.", "Freiwillige Selbstverpflichtung der Industrie."]],
+        ["14. Pariser Klimaabkommen", "Was ist das völkerrechtlich vereinbarte Kernziel des Pariser Abkommens von 2015?", "Begrenzung der Erwärmung auf deutlich unter 2 °C gegenüber der Vorindustrialisierung.", ["Vollständiges Verbot von Fleischkonsum bis 2030.", "Begrenzung der Erwärmung auf deutlich unter 2 °C gegenüber der Vorindustrialisierung.", "Sofortige Einstellung des weltweiten Flugverkehrs.", "Einführung einer globalen Einheitssteuer auf CO2.", "Bau von 5000 neuen Kernkraftwerken.", "Besiedlung des Mars als Ausweichplan."]],
+        ["15. Klimagerechtigkeit", "Was beschreibt das ethische Verursacherprinzip in der internationalen Klimapolitik?", "Wer Emissionen verursacht, muss für die daraus resultierenden Schäden aufkommen.", ["Alle Länder zahlen unabhängig vom Ausstoß das Gleiche.", "Wer Emissionen verursacht, muss für die daraus resultierenden Schäden aufkommen.", "Schwellenländer tragen die alleinige Hauptlast.", "Die Kosten werden allein durch Spenden gedeckt.", "Die Natur reguliert die Kosten selbstständig.", "Zukünftige Generationen haften für heutige Fehler."]],
+        ["16. Fossile Brennstoffe", "Warum hat Braunkohle chemisch gesehen die schlechteste CO2-Bilanz pro gewonnener Energieeinheit?", "Niedriger Brennwert bei gleichzeitig hohem Kohlenstoffanteil.", ["Sie enthält zu viel gebundenen Sauerstoff.", "Niedriger Brennwert bei gleichzeitig hohem Kohlenstoffanteil.", "Sie reagiert exotherm mit Stickstoff.", "Sie absorbiert Energie statt sie abzugeben.", "Sie besteht fast ausschließlich aus Wasserstoff.", "Sie lässt sich nicht rückstandsfrei verbrennen."]],
+        ["17. Photosynthese als Senke", "In welcher Form wird der atmosphärische Kohlenstoff in Wäldern langfristig chemisch gebunden?", "In Form von Biomasse (Lignin und Cellulose).", ["Als gelöstes Carbonat im Baumsaft.", "In Form von Biomasse (Lignin und Cellulose).", "Als gasförmiges Kohlenmonoxid im Holz.", "Als reiner Graphit in der Baumrinde.", "In Form von Calciumchlorid in den Blättern.", "Als flüssiges Methanol in den Wurzeln."]],
+        ["18. COP-Konferenzen", "Was bedeutet die Abkürzung COP im Rahmen der jährlichen UN-Klimagipfel?", "Conference of the Parties (Konferenz der Vertragsstaaten).", ["Committee of Power (Komitee der Mächte).", "Conference of the Parties (Konferenz der Vertragsstaaten).", "Climate Observation Project (Beobachtungsprojekt).", "Council of Producers (Rat der Produzenten).", "Clean Ocean Program (Ozeanprogramm).", "Center of Politics (Zentrum der Politik)."]],
+        ["19. Feedback-Mechanismen", "Was versteht man unter einer 'positiven Rückkopplung' im globalen Klimasystem?", "Ein Prozess, der die ursprüngliche Erwärmung selbstständig weiter verstärkt.", ["Ein Lob der Wissenschaft an die Politik.", "Ein Prozess, der die ursprüngliche Erwärmung selbstständig weiter verstärkt.", "Eine Abkühlung durch vermehrtes Pflanzenwachstum.", "Die Stabilisierung der Ozeantemperatur.", "Die Umkehrung der Meeresströmungen.", "Das Sinken des Meeresspiegels durch Verdunstung."]],
+        ["20. Individueller Handlungsspielraum", "Welche Maßnahme hat laut Umweltbundesamt im Durchschnitt den größten Hebel zur Reduktion des persönlichen CO2-Fußabdrucks?", "Verzicht auf Flugreisen und Reduktion tierischer Produkte.", ["Nutzung von Recycling-Toilettenpapier.", "Verzicht auf Flugreisen und Reduktion tierischer Produkte.", "Ausschalten von Standby-Geräten über Nacht.", "Konsequente Mülltrennung im Haushalt.", "Nutzung von Glas- statt Plastikflaschen.", "Kaltes Duschen während der Sommermonate."]]
+    ];
+
+    const qContainer = document.getElementById('dynamic-questions');
+    questionsData.forEach((q, index) => {
+        const id = "q" + (index + 4);
+        qContainer.innerHTML += `
+            <div class="quiz-card" id="${id}">
+                <h2>${q[0]}</h2>
+                <span class="question-desc">Kontext: Fachwissen</span>
+                <p>${q[1]}</p>
+                <select class="inline-select" data-ans="${q[2]}">
+                    <option value="">-- Bitte wählen --</option>
+                    ${q[3].map(opt => `<option>${opt}</option>`).join('')}
+                </select>
+                <button class="check-btn" onclick="checkTask('${id}', '${q[0]}')">Prüfen</button>
+                <div class="feedback"></div>
+            </div>
+        `;
+    });
+
+    function checkTask(qId, frageTitel) {
+        const card = document.getElementById(qId);
+        const sel = card.querySelector('select');
+        const feedback = card.querySelector('.feedback');
+        if(!sel.value || sel.disabled) return;
+
+        feedback.style.display = 'block';
+        if(sel.value === sel.dataset.ans) {
+            score++;
+            sel.classList.add('correct-ans');
+            feedback.innerHTML = "✔ Korrekt!";
+        } else {
+            sel.classList.add('wrong-ans');
+            feedback.innerHTML = "✘ Falsch!";
+            errorLog.push({ frage: frageTitel, gewaehlt: sel.value, richtig: sel.dataset.ans });
+        }
+        sel.disabled = true;
+    }
+
+    function checkMC(btn, isCorrect, qId, frageTitel) {
+        const card = document.getElementById(qId);
+        const feedback = card.querySelector('.feedback');
+        if(card.dataset.done) return;
+
+        feedback.style.display = 'block';
+        if(isCorrect) {
+            score++;
+            btn.classList.add('correct-ans');
+            feedback.innerHTML = "✔ Korrekt!";
+        } else {
+            btn.classList.add('wrong-ans');
+            feedback.innerHTML = "✘ Falsch!";
+            errorLog.push({ frage: frageTitel, gewaehlt: btn.innerText, richtig: "Langwellige Infrarotstrahlung (Wärmestrahlung)" });
+        }
+        card.dataset.done = "true";
+        card.querySelectorAll('.btn').forEach(b => b.disabled = true);
+    }
+
+    function openModal() { document.getElementById('confirm-modal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('confirm-modal').style.display = 'none'; }
+
+    function getPoints(percent) {
+        const scale = [[95,15],[90,14],[85,13],[80,12],[75,11],[70,10],[65,9],[60,8],[55,7],[50,6],[45,5],[40,4],[33,3],[27,2],[20,1],[0,0]];
+        for (let [p, pt] of scale) { if (percent >= p) return pt; }
+        return 0;
+    }
+
+    function finishQuiz() {
+        closeModal();
+        document.getElementById('quiz-main').style.display = 'none';
+        document.getElementById('eval-btn').style.display = 'none';
+        document.getElementById('quiz-header').style.display = 'none';
+        
+        const resDiv = document.getElementById('final-result');
+        resDiv.style.display = 'block';
+        
+        const percent = Math.round((score / 20) * 100);
+        const pts = getPoints(percent);
+        
+        document.getElementById('final-score').innerText = `${score} / 20 (${percent}%)`;
+        const badge = document.getElementById('points-badge');
+        badge.innerText = `${pts} Notenpunkte`;
+        
+        if(pts < 5) badge.style.background = "var(--error)";
+        else if(pts >= 10) badge.style.background = "var(--success)";
+
+        const errorBody = document.getElementById('error-body');
+        if(errorLog.length === 0) {
+            document.getElementById('error-section').innerHTML = "<h3 style='color:green; text-align:center;'>✨ Überragend! Du hast alle Fachfragen korrekt beantwortet.</h3>";
+        } else {
+            errorLog.forEach(err => {
+                errorBody.innerHTML += `<tr>
+                    <td>${err.frage}</td>
+                    <td class="txt-wrong">${err.gewaehlt}</td>
+                    <td class="txt-correct">${err.richtig}</td>
+                </tr>`;
+            });
+        }
+        window.scrollTo(0,0);
+    }
+</script>
+</body>
+</html>
